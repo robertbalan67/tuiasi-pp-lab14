@@ -1,66 +1,26 @@
-% ============================================================
-% einstein.pl — Problema lui Einstein (Zebra Puzzle)
-% Cine deține peștele?
-% ============================================================
-%
-% Există 5 case de culori diferite, așezate în linie (pozițiile 1-5).
-% Fiecare casă este locuită de o persoană de naționalitate diferită.
-% Fiecare persoană bea o anumită băutură, fumează un anumit brand
-% de țigări și deține un anumit animal.
-%
-% Fiecare casă este reprezentată ca:
-%   house(Culoare, Nationalitate, Bautura, Animal, Tigari)
-%
-% Cele 15 indicii:
-%  1. Britanicul locuiește în casa roșie.
-%  2. Suedezul ține un câine.
-%  3. Danezul bea ceai.
-%  4. Casa verde este imediat la stânga casei albe.
-%  5. Proprietarul casei verzi bea cafea.
-%  6. Persoana care fumează Pall Mall ține o pasăre.
-%  7. Proprietarul casei galbene fumează Dunhill.
-%  8. Persoana din mijloc (casa 3) bea lapte.
-%  9. Norvegianul locuiește în prima casă (stânga).
-% 10. Persoana care fumează Blend locuiește lângă cea cu pisica.
-% 11. Omul cu calul locuiește lângă cel care fumează Dunhill.
-% 12. Persoana care fumează BlueMaster bea bere.
-% 13. Germanul fumează Prince.
-% 14. Norvegianul locuiește lângă casa albastră.
-% 15. Persoana care fumează Blend are un vecin care bea apă.
-%
-% ============================================================
+left_of(X, Y, List) :- append(_, [X, Y | _], List).
 
-% next_to(X, Y, List) — X și Y sunt case vecine în lista List
-%
-% TODO: Decomentați și completați predicatul next_to/3:
-% next_to(X, Y, [X,Y|_]).
-% next_to(X, Y, [Y,X|_]).
-% next_to(X, Y, [_|T]) :- next_to(X, Y, T).
+next_to(X, Y, List) :- left_of(X, Y, List).
+next_to(X, Y, List) :- left_of(Y, X, List).
 
-% ============================================================
-% TODO: Implementați predicatul solution/1 care instanțiază
-% lista celor 5 case și verifică toate cele 15 constrângeri.
-%
-% Schelet de pornire:
-%
-% solution(Houses) :-
-%     Houses = [house(_,_,_,_,_), house(_,_,_,_,_), house(_,_,_,_,_),
-%               house(_,_,_,_,_), house(_,_,_,_,_)],
-%     % Indiciu 8: persoana din mijloc bea lapte
-%     Houses = [_, _, house(_, _, lapte, _, _), _, _],
-%     % Indiciu 9: norvegianul e primul
-%     Houses = [house(_, norvegian, _, _, _) | _],
-%     % Indiciu 1: britanicul locuiește în casa roșie
-%     member(house(rosu, britanic, _, _, _), Houses),
-%     % Indiciu 2: suedezul ține câine
-%     member(house(_, suedez, _, caine, _), Houses),
-%     % ... adăugați restul constrângerilor
-%     true.
+solution(Houses) :-
+    length(Houses, 5),
+    member(house(red, brit, _, _, _), Houses),
+    member(house(_, swede, dog, _, _), Houses),
+    member(house(_, dane, _, tea, _), Houses),
+    left_of(house(green, _, _, _, _), house(white, _, _, _, _), Houses),
+    member(house(green, _, _, coffee, _), Houses),
+    member(house(_, _, bird, _, pall_mall), Houses),
+    member(house(yellow, _, _, _, dunhill), Houses),
+    Houses = [_, _, house(_, _, _, milk, _), _, _],
+    Houses = [house(_, norwegian, _, _, _) | _],
+    next_to(house(_, _, _, _, blends), house(_, _, cat, _, _), Houses),
+    next_to(house(_, _, horse, _, _), house(_, _, _, _, dunhill), Houses),
+    member(house(_, _, _, beer, blue_master), Houses),
+    member(house(_, german, _, _, prince), Houses),
+    next_to(house(_, norwegian, _, _, _), house(blue, _, _, _, _), Houses),
+    next_to(house(_, _, _, _, blends), house(_, _, _, water, _), Houses).
 
-% ============================================================
-% TODO: Implementați einstein/1 care găsește proprietarul peștelui.
-%
-% einstein(Owner) :-
-%     solution(Houses),
-%     member(house(_, Owner, _, peste, _), Houses).
-% ============================================================
+einstein(Owner) :-
+    solution(Houses),
+    member(house(_, Owner, fish, _, _), Houses).
